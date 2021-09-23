@@ -376,6 +376,25 @@ class SynchrofactDetectionTestCase(unittest.TestCase):
                             spread=1, mode='delete', binary=False,
                             in_place=True, deletion_threshold=3)
 
+    def test_spiketime_equals_tstop(self):
+
+        # test synchrofact detection with a minimum number of
+        # three spikes per synchrofact
+
+        sampling_rate = 1 / pq.s
+
+        spiketrains = [neo.SpikeTrain([1, 1, 5, 10, 13, 16, 17, 19] * pq.s,
+                                      t_stop=21*pq.s),
+                       neo.SpikeTrain([1, 4, 7, 9, 12, 14, 16, 21] * pq.s,
+                                      t_stop=21*pq.s)]
+
+        correct_annotations = np.array([[3, 3, 2, 2, 3, 3, 3, 1],
+                                        [3, 2, 1, 2, 3, 3, 3, 1]])
+
+        self._test_template(spiketrains, correct_annotations, sampling_rate,
+                            spread=1, mode='delete', binary=False,
+                            in_place=True, deletion_threshold=3)
+
     def test_extract(self):
 
         # test synchrofact search taking into account adjacent bins
