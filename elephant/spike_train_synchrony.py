@@ -400,7 +400,10 @@ class Synchrotool(Complexity):
             spike_to_epoch_idx = np.searchsorted(
                 right_edges,
                 st.times.rescale(self.epoch.times.units).magnitude.flatten())
+            spike_to_epoch_idx[spike_to_epoch_idx
+                               >= len(epoch_complexities)] = -1
             complexity_per_spike = epoch_complexities[spike_to_epoch_idx]
+            complexity_per_spike[spike_to_epoch_idx == -1] = 1
 
             st.array_annotate(complexity=complexity_per_spike)
 
