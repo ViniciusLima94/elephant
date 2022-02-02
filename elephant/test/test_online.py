@@ -291,10 +291,10 @@ class TestCovarianceOnline(unittest.TestCase):
         for x_i, y_i in zip(X, Y):
             online_cov.update([x_i, y_i] * X.units)
         self.assertEqual(online_cov.units, X.units)
-        self.assertIsInstance(online_cov.get_cov(), pq.Quantity)
+        self.assertIsInstance(online_cov.get_cov(), float)
         for unbiased in (False, True):
             self.assertAlmostEqual(
-                online_cov.get_cov(unbiased=unbiased).magnitude,
+                online_cov.get_cov(unbiased=unbiased),
                 np.cov([X, Y], bias=not unbiased)[0][1])
 
     def test_quantities_vector(self):
@@ -305,10 +305,10 @@ class TestCovarianceOnline(unittest.TestCase):
         for x_i, y_i in zip(X, Y):
             online_cov.update([x_i, y_i] * X.units)
         self.assertEqual(online_cov.units, X.units)
-        self.assertIsInstance(online_cov.get_cov(), pq.Quantity)
+        self.assertIsInstance(online_cov.get_cov(), float)
         for unbiased in (False, True):
             self.assertAlmostEqual(
-                online_cov.get_cov(unbiased=unbiased).magnitude,
+                online_cov.get_cov(unbiased=unbiased),
                 np.cov(X.reshape(10*100), Y.reshape(10*100),
                        bias=not unbiased)[0][1], places=4)
 

@@ -133,11 +133,6 @@ class CovarianceOnline(object):
             self.count += 1
             self.covariance_sum += ((self.count - 1) / self.count) * delta_covar
 
-    def as_units(self, val):
-        if self.units is None:
-            return val
-        return pq.Quantity(val, units=self.units, copy=False)
-
     def get_cov(self, unbiased=False):
         if self.mean_x.mean is None and self.mean_y.mean is None:
             return None
@@ -146,7 +141,6 @@ class CovarianceOnline(object):
             cov = self.covariance_sum / count
         else:
             cov = 0.
-        cov = self.as_units(cov)
         return cov
 
     def reset(self):
