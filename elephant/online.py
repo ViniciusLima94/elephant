@@ -91,3 +91,67 @@ class VarianceOnline(MeanOnline):
     def reset(self):
         super(VarianceOnline, self).reset()
         self.variance_sum = 0.
+
+
+class CovarianceOnline(object):
+    def __init__(self, batch_mode=False):
+        self.batch_mode = batch_mode
+        self.mean_x = MeanOnline(batch_mode=batch_mode)
+        self.mean_y = MeanOnline(batch_mode=batch_mode)
+        self.units = None
+        self.covariance_sum = 0.
+        self.count = 0
+
+    def update(self, new_val_pair):
+        units = None
+        if isinstance(new_val_pair, pq.Quantity):
+            units = new_val_pair.units
+            new_val_pair = new_val_pair.magnitude
+        if self.mean_x.mean is None and self.mean_y.mean is None:
+            self.mean_x.mean = 0.
+            self.mean_y.mean = 0.
+            self.covariance_sum = 0.
+            self.units = units
+        elif units != self.units:
+            raise ValueError("Each batch must have the same units.")
+        if self.batch_mode:
+            self.mean_x.update(new_val_pair[0])
+            self.mean_y.update(new_val_pair[1])
+            delta_var_x = new_val_pair[0] - self.mean_x.mean
+            delta_var_y = new_val_pair[1] - self.mean_y.mean
+            delta_covar = delta_var_x * delta_var_y
+            batch_size = len(new_val_pair[0])
+            self.count += batch_size
+            delta_covar = delta_covar.sum(axis=0)
+            self.covariance_sum += delta_covar
+        else:
+            delta_var_x = new_val_pair[0] - self.mean_x.mean
+            delta_var_y = new_val_pair[1] - self.mean_y.mean
+            delta_covar = delta_var_x * delta_var_y
+            self.mean_x.update(new_val_pair[0])
+            self.mean_y.update(new_val_pair[1])
+            self.count += 1
+            self.covariance_sum += ((self.count - 1) / self.count) * delta_covar
+
+    def as_units(self, val):
+        if self.units is None:
+            return val
+        return pq.Quantity(val, units=self.units, copy=False)
+
+    def get_cov(self, unbiased=False):
+        if self.mean_x.mean is None and self.mean_y.mean is None:
+            return None
+        if self.count > 1:
+            count = self.count - 1 if unbiased else self.count
+            cov = self.covariance_sum / count
+        else:
+            cov = 0.
+        cov = self.as_units(cov)
+        return cov
+
+    def reset(self):
+        self.mean_x.reset()
+        self.mean_y.reset()
+        self.units = None
+        self.covariance_sum = 0.
+        self.count = 0
