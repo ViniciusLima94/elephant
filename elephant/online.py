@@ -149,3 +149,49 @@ class CovarianceOnline(object):
         self.units = None
         self.covariance_sum = 0.
         self.count = 0
+
+
+class PearsonCorrelationCoefficientOnline(object):
+    def __init__(self, batch_mode=False):
+        self.batch_mode = batch_mode
+        self.covariance_xy = CovarianceOnline(batch_mode=batch_mode)
+        self.units = None
+        self.R_xy = 0.
+        self.count = 0
+
+    def update(self, new_val_pair):
+        units = None
+        if isinstance(new_val_pair, pq.Quantity):
+            units = new_val_pair.units
+            new_val_pair = new_val_pair.magnitude
+        if self.count == 0:
+            self.covariance_xy.var_y.mean = 0.
+            self.covariance_xy.var_y.mean = 0.
+            self.units = units
+        elif units != self.units:
+            raise ValueError("Each batch must have the same units.")
+        self.covariance_xy.update(new_val_pair)
+        if self.batch_mode:
+            batch_size = len(new_val_pair[0])
+            self.count += batch_size
+        else:
+            self.count += 1
+        if self.count > 1:
+            self.R_xy = np.divide(
+                self.covariance_xy.covariance_sum,
+                (np.sqrt(self.covariance_xy.var_x.variance_sum *
+                 self.covariance_xy.var_y.variance_sum)))
+
+    def get_pcc(self):
+        if self.count == 0:
+            return None
+        elif self.count == 1:
+            return 0.
+        else:
+            return self.R_xy
+
+    def reset(self):
+        self.count = 0
+        self.units = None
+        self.R_xy = 0.
+        self.covariance_xy.reset()
