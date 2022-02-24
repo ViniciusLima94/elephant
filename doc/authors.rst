@@ -30,7 +30,7 @@ contribution, and may not be the current affiliation of a contributor.
 * Julia Sprenger (orcid: 0000-0002-9986-7477) [1]
 * Junji Ito (orcid: 0000-0001-9170-4422) [1]
 * Manuel Ciba (orcid: 0000-0003-2951-135X) [12]
-* Maximilian Kramer [1]
+* Maximilian Kramer (orcid: 0000-0002-9302-5893) [1]
 * Michael Denker (orcid: 0000-0003-1255-7300) [1]
 * Michael von Papen (orcid: 0000-0001-5030-1643) [1]
 * Michał Czerwiński (orcid: 0000-0002-5569-4252) [9]
