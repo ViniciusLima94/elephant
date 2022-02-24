@@ -41,7 +41,7 @@ contribution, and may not be the current affiliation of a contributor.
 * Philipp Steigerwald [12]
 * Pierre Yger (orcid: 0000-0003-1376-5240) [2]
 * Pietro Quaglio (orcid: 0000-0002-8012-3056) [1]
-* Regimantas Jurkus [1]
+* Regimantas Jurkus (orcid: 0000-0003-0789-6279) [1]
 * Richard C Gerkin (orcid: 0000-0002-2940-3378) [7]
 * Richard Meyes [1]
 * Robert Pröpper [6]
