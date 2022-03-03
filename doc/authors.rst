@@ -12,7 +12,7 @@ contribution, and may not be the current affiliation of a contributor.
 * Alexander van Meegen (orcid: 0000-0003-2766-3982) [1]
 * Alper Yegenoglu (orcid: 0000-0001-8869-215X) [1]
 * Andrew Davison (orcid: 0000-0002-4793-7541) [2]
-* Anno Kurth (orcid: 0000-0002-9557-1003) [1]
+* Anno Christopher Kurth (orcid: 0000-0002-9557-1003) [1]
 * Bartosz Telenczuk (orcid: 0000-0002-9884-3537) [2]
 * Björn Müller [1]
 * Chaitanya Chintaluri (orcid: 0000-0003-4252-1608) [9]
