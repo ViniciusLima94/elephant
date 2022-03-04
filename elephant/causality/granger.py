@@ -75,6 +75,8 @@ References
 
 from __future__ import division, print_function, unicode_literals
 
+import numba as nb
+
 import warnings
 from collections import namedtuple
 
@@ -372,6 +374,7 @@ def _optimal_vector_arm(signals, dimension, max_order,
     return optimal_coeffs, optimal_cov_matrix, optimal_order
 
 
+nb.jit(nopython=True)
 def _bracket_operator(spectrum, num_freqs, num_signals):
     '''
     Implementation of the [ \cdot ]^{+} from "The Factorization of Matricial
@@ -417,6 +420,7 @@ def _bracket_operator(spectrum, num_freqs, num_signals):
     return causal_part
 
 
+@nb.jit(nopython=True)
 def _dagger(matrix_array):
     '''
     Return Hermitian conjugate of matrix array
@@ -453,27 +457,34 @@ def _spectral_factorization(cross_spectrum, num_iterations):
         raise NotImplementedError('ToDo - non converging Cholesky')
 
     factorization += initial_cond
-    # Iteration for calculating spectral factorization
-    for i in range(num_iterations):
 
-        factorization_old = np.copy(factorization)
+    @nb.jit(nopython=True)
+    def _factorize(factorization):
+        """Wrapps for loop in a function to pre-compile it using Numba"""
+        # Iteration for calculating spectral factorization
+        for i in range(num_iterations):
 
-        # Implementation of Eq. 3.1 from "The Factorization of Matricial
-        # Spectral Densities", Wilson 1972, SiAM J Appl Math
-        X = np.linalg.solve(factorization,
-                            spectral_density_function)
-        Y = np.linalg.solve(factorization,
-                            _dagger(X))
-        Y += identity
-        Y = _bracket_operator(Y, num_freqs, num_signals)
+            factorization_old = np.copy(factorization)
 
-        factorization = np.matmul(factorization, Y)
+            # Implementation of Eq. 3.1 from "The Factorization of Matricial
+            # Spectral Densities", Wilson 1972, SiAM J Appl Math
+            X = np.linalg.solve(factorization,
+                                spectral_density_function)
+            Y = np.linalg.solve(factorization,
+                                _dagger(X))
+            Y += identity
+            Y = _bracket_operator(Y, num_freqs, num_signals)
 
-        diff = factorization - factorization_old
-        error = np.max(np.abs(diff))
-        if error < 1e-10:
-            print(f'Spectral factorization converged after {i} steps')
-            break
+            factorization = np.matmul(factorization, Y)
+
+            diff = factorization - factorization_old
+            error = np.max(np.abs(diff))
+            if error < 1e-10:
+                break
+                # print(f'Spectral factorization converged after {i} steps')
+        return factorization
+
+    factorization = _factorize(factorization)
 
     cov_matrix = np.matmul(factorization[0],
                            _dagger(factorization[0]))
